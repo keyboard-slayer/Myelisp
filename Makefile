@@ -12,7 +12,6 @@ CFLAGS = 			\
 		-std=c2x	\
 		-pedantic	\
 		-Wpedantic	\
-		--analyzer 	\
 		-Isrc/      \
 		-Werror 	\
 		-Wextra 	\

@@ -1,6 +1,4 @@
-#include "parser.h"
-#include "types.h"
-#include "utils/reader.h"
+#include "myelisp.h"
 #include "utils/istype.h"
 
 #include <stdio.h>
@@ -28,7 +26,7 @@ static Type readlist(TokenReader *r)
         }
 
         tmp = readform(r);
-        vec_push(&token.as_list, tmp);
+        (void) vec_push(&token.as_list, tmp);
     }
 
     (void) reader_next(r);
@@ -100,10 +98,10 @@ static Type readform(TokenReader *r)
     }
 }
 
-static void ast_free(Type *ast)
+void ast_free(Type *ast)
 {
     Type tok;
-    size_t i;
+    int i;
 
     if (ast->type != MYELISP_LIST)
     {
@@ -121,13 +119,20 @@ static void ast_free(Type *ast)
     vec_deinit(&ast->as_list);
 }
 
-void myelisp_parser(Tokens toks)
+Type myelisp_parser(Tokens toks)
 {
     TokenReader r;
     Type ast;
+
+    ast.type = MYELISP_LIST;
+    vec_init(&ast.as_list);
     
     reader_init(&r, toks.data, toks.length);
 
-    ast = readform(&r);
-    ast_free(&ast);
+    while (!reader_eof(&r))
+    {
+        (void) vec_push(&ast.as_list, readform(&r));
+    }
+
+    return ast; 
 }

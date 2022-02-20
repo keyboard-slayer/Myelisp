@@ -1,10 +1,9 @@
-#include "lexer.h"
+#include "myelisp.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-
 
 static void token_smart_push(Tokens *tokens, Token *tok)
 {
@@ -13,12 +12,13 @@ static void token_smart_push(Tokens *tokens, Token *tok)
         char *tmp = calloc(tok->length + 1, 1);
         if (tmp == NULL)
         {
+            free(tmp);
             perror("");
             exit(1);
         }
 
         memcpy(tmp, tok->data, tok->length);
-        vec_push(tokens, tmp);
+        (void) vec_push(tokens, tmp);
         vec_clear(tok);
     }
 }
@@ -26,7 +26,7 @@ static void token_smart_push(Tokens *tokens, Token *tok)
 void token_free(Tokens *toks)
 {
     char *tok;
-    size_t i;
+    int i;
 
     vec_foreach(toks, tok, i)
     {
@@ -73,7 +73,7 @@ Tokens myelisp_lexer(FileContent code)
             {
                 if (isstr)
                 {
-                    vec_push(&tok, ' ');
+                    (void) vec_push(&tok, ' ');
                 }
                 else  
                 {
@@ -87,7 +87,7 @@ Tokens myelisp_lexer(FileContent code)
             {
                 if (isstr)
                 {
-                    vec_push(&tok, '#');
+                    (void) vec_push(&tok, '#');
                 }
                 else  
                 {
@@ -100,8 +100,8 @@ Tokens myelisp_lexer(FileContent code)
                     if (code[index + 1] == 't' || code[index + 1] == '\\' ||
                         code[index + 1] == '(')
                     {
-                        vec_push(&tok, '#');
-                        vec_push(&tok, code[index + 1]);
+                        (void) vec_push(&tok, '#');
+                        (void) vec_push(&tok, code[index + 1]);
                         token_smart_push(&tokens, &tok);
                     }
                 }
@@ -114,15 +114,16 @@ Tokens myelisp_lexer(FileContent code)
             case '(':
             case ')':
             {
+                token_smart_push(&tokens, &tok);
+
                 if (!isstr)
                 {
-                    token_smart_push(&tokens, &tok);
-                    vec_push(&tok, code[index]);
+                    (void) vec_push(&tok, code[index]);
                     token_smart_push(&tokens, &tok);
                 }
                 else  
                 {
-                    vec_push(&tok, code[index]);
+                    (void) vec_push(&tok, code[index]);
                 }
 
                 break;
@@ -136,14 +137,14 @@ Tokens myelisp_lexer(FileContent code)
                     exit(1);
                 }
 
-                vec_push(&tok, '"');
+                (void) vec_push(&tok, '"');
 
                 if (isstr)
                 {
                     token_smart_push(&tokens, &tok);
                 }
 
-                isstr = true;
+                isstr = !isstr;
                 break;
             }
 
@@ -156,7 +157,7 @@ Tokens myelisp_lexer(FileContent code)
 
             default:
             {
-                vec_push(&tok, code[index]);
+                (void) vec_push(&tok, code[index]);
             }
 
         }

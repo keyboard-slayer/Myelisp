@@ -16,7 +16,7 @@ enum MYELISP_TYPES
 };
 
 typedef struct myelisp_type Type;
-typedef Vec(Type) MyelispVec;
+typedef vec_t(Type) MyelispVec;
 
 struct myelisp_type
 {
@@ -31,3 +31,5 @@ struct myelisp_type
         MyelispVec as_list;
     };
 };
+
+#define NIL (Type) {.type = MYELISP_NIL}
