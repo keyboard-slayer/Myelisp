@@ -1,0 +1,7 @@
+-std=c2x
+-pedantic
+-Wpedantic
+-Wall
+-Wextra
+-Werror
+-I./src
